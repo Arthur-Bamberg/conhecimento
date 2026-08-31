@@ -1,0 +1,45 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: conhecimento
+      POSTGRES_PASSWORD: conhecimento
+      POSTGRES_DB: conhecimento
+    ports:
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U conhecimento"]
+      interval: 3s
+      timeout: 5s
+      retries: 20
+    volumes:
+      - conhecimento-pg:/var/lib/postgresql/data
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    ports:
+      - "3001:3001"
+    environment:
+      DATABASE_URL: postgres://conhecimento:conhecimento@postgres:5432/conhecimento
+      AI_PROVIDER: fake
+      WEB_ORIGIN: http://localhost:3000
+      PORT: 3001
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:3001/api/health').then((r)=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  conhecimento-pg:

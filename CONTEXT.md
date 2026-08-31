@@ -5,8 +5,16 @@ Textos organizados num workspace, usados principalmente por **chat com IA**. Kan
 ## Language
 
 **Texto**:
-Unidade de conhecimento: título e corpo, no workspace. Na fatia A é a única peça persistida de produto além do chat.
-_Avoid_: Página (recorte antigo), nota, documento, artigo, post
+Unidade de conhecimento: `titulo`, `corpo` (markdown) e `sumario`, no workspace. Na fatia A é a única peça persistida de produto além do chat.
+_Avoid_: Página (recorte antigo), nota, documento, artigo, post, bloco, arquivo
+
+**Sumário**:
+Recorte curto de um Texto, gerado pela IA a partir do título e do corpo. Aparece na lista; a pessoa não edita.
+_Avoid_: descrição (campo de formulário), excerpt, abstract, resumo manual
+
+**Sumário do workspace**:
+Recorte curto do conjunto de Textos, gerado pela IA. Aparece na lista de textos; a pessoa não edita.
+_Avoid_: descrição coletiva, overview, digest, resumo geral
 
 **Chat**:
 Conversa com a IA que monta contexto a partir de textos (anexados e/ou busca lexical). É a interface da IA na fatia A.
@@ -25,8 +33,16 @@ Porta que gera texto (stream ou síncrono). Runtime usa uma implementação real
 _Avoid_: SDK, Gemini (como nome da porta), modelo (como tipo de domínio)
 
 **Stream**:
-Sequência de tokens da resposta do chat até o cliente. O contrato HTTP fecha-se no feature-loop da A.
-_Avoid_: Websocket (salvo decisão explícita), EventSource como único transporte já escolhido
+Resposta NDJSON de `POST /api/chats/:id/mensagens`. Linhas: `token`, `fonte`, `done` ou `error`.
+_Avoid_: WebSocket, EventSource/SSE, reconstruir fontes a partir dos tokens
+
+**Fonte**:
+Texto citado na resposta do assistente (`textoId` + `titulo`), emitido como linha de stream e persistido na Mensagem.
+_Avoid_: citation genérica, RAG hit, attachment
+
+**Mensagem**:
+Turno persistido de um Chat (`user` | `assistant`), com `conteudo` e, no assistente, `fontes`.
+_Avoid_: prompt, completion, comment
 
 **Kanban**:
 Quadro de colunas e cards (fatia B). Não faz parte da A.

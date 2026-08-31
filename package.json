@@ -1,0 +1,14 @@
+{
+  "name": "conhecimento",
+  "private": true,
+  "packageManager": "pnpm@9.15.9",
+  "scripts": {
+    "dev": "pnpm --parallel --filter @conhecimento/api --filter @conhecimento/web dev",
+    "test": "pnpm --filter @conhecimento/contracts test && pnpm --filter @conhecimento/api test",
+    "typecheck": "pnpm -r typecheck",
+    "e2e": "pnpm --filter @conhecimento/web test:e2e"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

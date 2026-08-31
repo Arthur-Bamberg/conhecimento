@@ -9,7 +9,7 @@ Base de conhecimento (textos) + **chat com IA**, com kanban na fatia B. Segundo 
 
 ## Status
 
-Repo bootstrap. Ainda **não** há API, web nem compose — isso entra no `/feature-loop` da **MVP-A** (“Chat sobre os meus textos”).
+**MVP-A** entregue (chat + textos na web, Nest lazy, Postgres). Decisões: `.scratch/feature-loop/mvp-a-chat-textos/decisions.md`.
 
 Ordem das fatias: **A → B → C → D**.
 
@@ -22,8 +22,13 @@ Ordem das fatias: **A → B → C → D**.
 
 ## Comandos
 
-Nada para instalar ainda. Depois da fatia A:
-
 ```bash
-# a definir no feature-loop (compose + testes)
+cp .env.example .env
+pnpm install
+docker compose up --build      # Postgres :5433 + API :3001
+pnpm --filter @conhecimento/web dev   # http://localhost:3000
+pnpm test
+pnpm e2e                       # Playwright, AI_PROVIDER=fake
 ```
+
+Gemini no runtime: `AI_PROVIDER=gemini` e `GEMINI_API_KEY` no `.env` (só na API). E2E e `pnpm test` usam Fake.

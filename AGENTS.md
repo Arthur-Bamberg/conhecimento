@@ -38,16 +38,18 @@ Este plano **substitui** o recorte antigo em `personal/.scratch/feature-loop/pla
 | Persistência | **PostgreSQL** (compose na A; gerenciado na C) |
 | Deploy | **Google Cloud Run** na **C**, não como prova da A |
 | Superfície A | **Web desktop (browser)** |
-| Cliente web | **Aberto:** Expo Web vs Next.js — fechar no feature-loop da A |
-| Corpo do texto | **Aberto:** markdown simples vs blocos |
-| Stream | **Aberto:** NDJSON vs SSE — fechar no feature-loop da A |
-| Provider runtime | Plugável; **Fake** em teste/e2e/CI — **nunca** LLM real no CI |
-| Pacotes | Esperado **pnpm** + monorepo quando a A existir; não scaffoldar `apps/` vazios |
+| Cliente web | **Next.js** App Router (`apps/web`); Expo na D |
+| Corpo do texto | **Markdown** (`titulo` + `corpo`) |
+| Stream | **POST + NDJSON** (`token` / `fonte` / `done` / `error`) |
+| Provider runtime | Porta `AIProvider`; Gemini no runtime; **Fake** se `AI_PROVIDER=fake` |
+| Pacotes | pnpm: `apps/api`, `apps/web`, `packages/contracts` |
+| Decisões A | `.scratch/feature-loop/mvp-a-chat-textos/decisions.md` |
+| ADRs | `docs/adr/0001`–`0005` |
 | Testes | Unit na API/contratos; e2e **Playwright** no browser com FakeAI |
 | Locale | **pt-BR** na UI de produto |
 | Auth | Fora de A–B; mínima na C se precisar (não multi-tenant) |
 
-Não crie `apps/api` / `apps/app` até o feature-loop da A. Não misture com `orquestrador-ofertas-supermercados`.
+Não misture com `orquestrador-ofertas-supermercados`.
 
 ## Pipeline por fatia (`/feature-loop`)
 
