@@ -24,12 +24,9 @@ describe("FakeAIProvider", () => {
     }
     const tokens = lines.filter((l) => l.type === "token");
     const fontes = lines.filter((l) => l.type === "fonte");
-    expect(tokens.map((l) => (l.type === "token" ? l.text : "")).join("")).toContain(
-      "Receitas",
-    );
-    expect(tokens.map((l) => (l.type === "token" ? l.text : "")).join("")).toContain(
-      "chocolate",
-    );
+    const texto = tokens.map((l) => (l.type === "token" ? l.text : "")).join("");
+    expect(texto).toContain("Com base no texto **Receitas**");
+    expect(texto).toContain("chocolate");
     expect(fontes).toEqual([
       { type: "fonte", textoId: receitas.id, titulo: receitas.titulo },
     ]);

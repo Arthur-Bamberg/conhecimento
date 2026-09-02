@@ -67,7 +67,7 @@ Greenfield no repo `conhecimento`: chat web sobre **Textos** (título + corpo), 
 ### D7 — Provider
 - **Pergunta:** Quem gera tokens em runtime vs testes?
 - **Opções:**
-  - A: Porta `AIProvider`. Runtime **Gemini** (`GEMINI_API_KEY`, modelo default `gemini-2.5-flash`). Testes/e2e/CI: **FakeAIProvider** via `AI_PROVIDER=fake`. Chave **só** no backend. `NEXT_PUBLIC_*` nunca leva credencial.
+  - A: Porta `AIProvider`. Runtime **Gemini** (`GEMINI_API_KEY`, modelo default `gemini-3.6-flash`). Testes/e2e/CI: **FakeAIProvider** via `AI_PROVIDER=fake`. Chave **só** no backend. `NEXT_PUBLIC_*` nunca leva credencial.
   - B: Sempre Gemini (também no CI)
   - C: OpenAI como default
 - **Recomendado:** A — CI determinístico; Gemini é o runtime pessoal já usado noutros projetos.
@@ -125,7 +125,7 @@ Greenfield no repo `conhecimento`: chat web sobre **Textos** (título + corpo), 
 ### D13 — FakeAI
 - **Pergunta:** O que o provider falso emite?
 - **Opções:**
-  - A: Escolhe o texto do contexto com **maior overlap** de palavras com o pedido; faz stream de tokens `Segundo o texto "{titulo}": {trecho}` (trecho = primeiras ~200 chars do corpo, ou título se corpo vazio); emite `fonte` desse texto; depois `done`. Sem parse de sentinela.
+  - A: Escolhe o texto do contexto com **maior overlap** de palavras com o pedido; faz stream de tokens `Com base no texto **{titulo}**, isto é o que está gravado.` + trecho (primeiras ~200 chars do corpo, ou título se corpo vazio); emite `fonte` desse texto; depois `done`. Sem parse de sentinela. Runtime Gemini usa prompt elaborado + histórico.
   - B: Resposta fixa sem citar texto
   - C: Segunda chamada JSON
 - **Recomendado:** A — o e2e asserta citação/origem sem LLM.

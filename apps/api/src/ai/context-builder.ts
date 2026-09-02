@@ -19,20 +19,44 @@ function contemLexical(texto: TextoContexto, tokens: string[]): boolean {
   return tokens.every((token) => hay.includes(token));
 }
 
+function promptDoContexto(textos: TextoContexto[], pedido: string): string {
+  const blocos = textos.map((t) => `## ${t.titulo}\n${t.corpo}`).join("\n\n");
+  return `Textos:\n${blocos}\n\nPedido:\n${pedido}`;
+}
+
+function truncarCorpo(
+  texto: TextoContexto,
+  pedido: string,
+  orcamento: number,
+): TextoContexto | undefined {
+  const vazio = { ...texto, corpo: "" };
+  const base = promptDoContexto([vazio], pedido).length;
+  if (base > orcamento) {
+    return undefined;
+  }
+  return { ...texto, corpo: texto.corpo.slice(0, orcamento - base) };
+}
+
 function caberNoOrcamento(
   textos: TextoContexto[],
   pedido: string,
   orcamento: number,
 ): TextoContexto[] {
   const out: TextoContexto[] = [];
-  let usado = pedido.length;
   for (const texto of textos) {
-    const custo = texto.titulo.length + texto.corpo.length + 16;
-    if (out.length > 0 && usado + custo > orcamento) {
+    const candidato = [...out, texto];
+    if (promptDoContexto(candidato, pedido).length <= orcamento) {
+      out.push(texto);
+      continue;
+    }
+    if (out.length > 0) {
       break;
     }
-    out.push(texto);
-    usado += custo;
+    const truncado = truncarCorpo(texto, pedido, orcamento);
+    if (truncado) {
+      out.push(truncado);
+    }
+    break;
   }
   return out;
 }
@@ -60,10 +84,8 @@ export function montarContexto(input: {
 
   escolhidos = caberNoOrcamento(escolhidos, input.pedido, orcamento);
 
-  const blocos = escolhidos
-    .map((t) => `## ${t.titulo}\n${t.corpo}`)
-    .join("\n\n");
-  const prompt = `Textos:\n${blocos}\n\nPedido:\n${input.pedido}`;
-
-  return { textos: escolhidos, prompt };
+  return {
+    textos: escolhidos,
+    prompt: promptDoContexto(escolhidos, input.pedido),
+  };
 }

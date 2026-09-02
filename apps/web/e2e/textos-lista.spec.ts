@@ -4,6 +4,7 @@ test("lista mostra sumário do workspace e permite apagar", async ({ page }) => 
   const titulo = `Lixeira ${Date.now()}`;
   await page.goto("/textos");
   await expect(page.getByRole("heading", { name: "Textos" })).toBeVisible();
+  await expect(page.getByTestId("lista-chats")).toHaveCount(0);
 
   await page.getByLabel("Título do novo texto").fill(titulo);
   await page.getByLabel("Conteúdo do novo texto").fill("Só para apagar.");

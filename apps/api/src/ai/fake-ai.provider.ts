@@ -23,7 +23,11 @@ export class FakeAIProvider implements AIProvider {
       return;
     }
     const trecho = (texto.corpo.trim() || texto.titulo).slice(0, 200);
-    const resposta = `Segundo o texto **${texto.titulo}**: ${trecho}`;
+    const resposta = [
+      `Com base no texto **${texto.titulo}**, isto é o que está gravado.`,
+      "",
+      trecho,
+    ].join("\n");
     yield* chunks(resposta);
     yield { type: "fonte", textoId: texto.id, titulo: texto.titulo };
     yield { type: "done" };

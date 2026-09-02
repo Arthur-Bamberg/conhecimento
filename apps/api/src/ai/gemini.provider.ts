@@ -8,6 +8,24 @@ import type {
 } from "./ai-provider";
 import { recorteColecao, recorteSumario } from "./recorte-sumario";
 import { resolverFontes } from "./resolver-fontes";
+import {
+  INSTRUCAO_CHAT,
+  montarPromptChat,
+  montarPromptColecao,
+  montarPromptSumario,
+} from "./prompts";
+
+function modelo(key: string, systemInstruction?: string, maxOutputTokens = 8192) {
+  const genai = new GoogleGenerativeAI(key);
+  return genai.getGenerativeModel({
+    model: process.env.GEMINI_MODEL ?? "gemini-3.6-flash",
+    systemInstruction,
+    generationConfig: {
+      temperature: systemInstruction ? 0.75 : 0.4,
+      maxOutputTokens,
+    },
+  });
+}
 
 export class GeminiProvider implements AIProvider {
   async *stream(input: StreamPedido): AsyncIterable<StreamLine> {
@@ -20,18 +38,23 @@ export class GeminiProvider implements AIProvider {
       };
       return;
     }
-    const modelName = process.env.GEMINI_MODEL ?? "gemini-3.6-flash";
-    const genai = new GoogleGenerativeAI(key);
-    const model = genai.getGenerativeModel({ model: modelName });
-    const blocos = input.textos
-      .map((t) => `## ${t.titulo}\n${t.corpo}`)
-      .join("\n\n");
-    const prompt = `Você responde com base só nos textos abaixo. Cite o título do texto usado.\n\nTextos:\n${blocos}\n\nPedido:\n${input.pedido}`;
+    const prompt = montarPromptChat({
+      pedido: input.pedido,
+      textos: input.textos,
+      historico: input.historico,
+    });
     try {
-      const result = await model.generateContentStream(prompt);
+      const result = await modelo(key, INSTRUCAO_CHAT).generateContentStream(
+        prompt,
+      );
       let resposta = "";
       for await (const chunk of result.stream) {
-        const text = chunk.text();
+        let text = "";
+        try {
+          text = chunk.text();
+        } catch {
+          continue;
+        }
         if (text) {
           resposta += text;
           yield { type: "token", text };
@@ -63,19 +86,9 @@ export class GeminiProvider implements AIProvider {
     if (!key) {
       return recorteSumario(input.titulo, input.corpo);
     }
-    const modelName = process.env.GEMINI_MODEL ?? "gemini-3.6-flash";
-    const genai = new GoogleGenerativeAI(key);
-    const model = genai.getGenerativeModel({ model: modelName });
-    const prompt = [
-      "Resuma o texto abaixo numa única frase em português brasileiro.",
-      "Sem markdown, sem aspas, no máximo 160 caracteres.",
-      "Responda só com o sumário.",
-      "",
-      `Título: ${input.titulo}`,
-      "",
-      input.corpo,
-    ].join("\n");
-    const result = await model.generateContent(prompt);
+    const result = await modelo(key, undefined, 2048).generateContent(
+      montarPromptSumario(input.titulo, input.corpo),
+    );
     return result.response.text().trim();
   }
 
@@ -87,20 +100,9 @@ export class GeminiProvider implements AIProvider {
     if (!key) {
       return recorteColecao(input.textos);
     }
-    const modelName = process.env.GEMINI_MODEL ?? "gemini-3.6-flash";
-    const genai = new GoogleGenerativeAI(key);
-    const model = genai.getGenerativeModel({ model: modelName });
-    const blocos = input.textos
-      .map((t) => `- ${t.titulo}: ${t.recorte || t.titulo}`)
-      .join("\n");
-    const prompt = [
-      "Resuma o conjunto de textos abaixo em 1 ou 2 frases em português brasileiro.",
-      "Diga o que a pessoa tem gravado. Sem markdown, sem aspas, no máximo 280 caracteres.",
-      "Responda só com o sumário.",
-      "",
-      blocos,
-    ].join("\n");
-    const result = await model.generateContent(prompt);
+    const result = await modelo(key, undefined, 2048).generateContent(
+      montarPromptColecao(input.textos),
+    );
     return result.response.text().trim();
   }
 }

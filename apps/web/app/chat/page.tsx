@@ -38,17 +38,30 @@ export default function ChatPage() {
     });
   }, [chats.data, chatId, queryClient]);
 
+  function limparRascunho() {
+    setRascunho("");
+    setFontes([]);
+    setPedidoPendente(null);
+    setErroChat(null);
+    setPedido("");
+  }
+
   const novoChat = useMutation({
     mutationFn: () => createChat(),
     onSuccess: async (chat) => {
       setChatId(chat.id);
-      setRascunho("");
-      setFontes([]);
-      setPedidoPendente(null);
-      setErroChat(null);
+      limparRascunho();
       await queryClient.invalidateQueries({ queryKey: ["chats"] });
     },
   });
+
+  function selecionarChat(id: string) {
+    if (id === chatId || enviando) {
+      return;
+    }
+    setChatId(id);
+    limparRascunho();
+  }
 
   const detalhe = useQuery({
     queryKey: ["chat", chatId],
@@ -88,6 +101,7 @@ export default function ChatPage() {
         }
       }
       await queryClient.invalidateQueries({ queryKey: ["chat", chatId] });
+      await queryClient.invalidateQueries({ queryKey: ["chats"] });
       setRascunho("");
       setFontes([]);
       setPedidoPendente(null);
@@ -116,27 +130,67 @@ export default function ChatPage() {
     !erroChat;
 
   return (
-    <div className="flex min-h-[70vh] flex-col gap-5">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+    <div className="flex min-h-[70vh] flex-col gap-4 lg:flex-row lg:items-stretch">
+      <aside
+        data-testid="lista-chats"
+        className="card flex max-h-48 w-full shrink-0 flex-col overflow-hidden p-2 lg:max-h-none lg:w-60"
+      >
+        <button
+          type="button"
+          className="btn-ghost w-full shrink-0 text-sm"
+          onClick={() => novoChat.mutate()}
+          disabled={novoChat.isPending || enviando}
+        >
+          Nova conversa
+        </button>
+        <p className="mt-3 px-2 text-xs font-medium tracking-wide text-muted uppercase">
+          Conversas
+        </p>
+        <nav
+          aria-label="Conversas"
+          className="mt-1 min-h-0 flex-1 overflow-y-auto"
+        >
+          {chats.isPending ? (
+            <p className="px-2 py-2 text-sm text-muted">A carregar…</p>
+          ) : null}
+          {chats.isError ? (
+            <p className="px-2 py-2 text-sm text-danger">
+              Não foi possível carregar as conversas.
+            </p>
+          ) : null}
+          {(chats.data ?? []).map((chat) => {
+            const ativo = chat.id === chatId;
+            return (
+              <button
+                key={chat.id}
+                type="button"
+                aria-current={ativo ? "true" : undefined}
+                title={chat.titulo}
+                disabled={enviando}
+                className={
+                  ativo
+                    ? "flex w-full rounded-xl bg-accent-soft px-3 py-2 text-left text-sm font-medium text-accent"
+                    : "flex w-full rounded-xl px-3 py-2 text-left text-sm text-foreground hover:bg-surface"
+                }
+                onClick={() => selecionarChat(chat.id)}
+              >
+                <span className="truncate">{chat.titulo}</span>
+              </button>
+            );
+          })}
+        </nav>
+      </aside>
+      <div className="flex min-w-0 flex-1 flex-col gap-5">
         <div>
           <h1 className="text-3xl font-semibold tracking-tight">Chat</h1>
           <p className="mt-1 max-w-xl text-sm text-muted">
             Pergunte sobre os seus textos. A origem aparece como fonte.
           </p>
         </div>
-        <button
-          type="button"
-          className="btn-ghost w-fit text-sm"
-          onClick={() => novoChat.mutate()}
-          disabled={novoChat.isPending}
+        <div
+          data-testid="mensagens"
+          className="card flex flex-1 flex-col gap-3 overflow-y-auto p-4"
         >
-          Nova conversa
-        </button>
-      </div>
-      <div
-        data-testid="mensagens"
-        className="card flex flex-1 flex-col gap-3 overflow-y-auto p-4"
-      >
         {vazio ? (
           <p className="m-auto max-w-sm py-10 text-center text-sm text-muted">
             Ainda não há mensagens. O assistente responde com base nos textos
@@ -213,6 +267,7 @@ export default function ChatPage() {
           {enviando ? "Enviando…" : "Enviar"}
         </button>
       </form>
+      </div>
     </div>
   );
 }

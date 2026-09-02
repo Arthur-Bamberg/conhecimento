@@ -1,9 +1,15 @@
 import type { StreamLine } from "@conhecimento/contracts";
 import type { TextoContexto } from "./context-builder";
 
+export type TurnoHistorico = {
+  role: "user" | "assistant";
+  conteudo: string;
+};
+
 export type StreamPedido = {
   pedido: string;
   textos: TextoContexto[];
+  historico?: TurnoHistorico[];
 };
 
 export type SumariarPedido = {

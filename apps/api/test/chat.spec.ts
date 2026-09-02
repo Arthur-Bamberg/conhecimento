@@ -62,4 +62,53 @@ describe("chat HTTP", () => {
     expect(detalhe.body.mensagens).toHaveLength(2);
     expect(detalhe.body.mensagens[1].fontes[0].titulo).toBe("Receitas");
   });
+
+  it("título do chat vem do pedido e não cria texto", async () => {
+    const server = app.getHttpServer();
+    const textosAntes = await request(server).get("/api/textos").expect(200);
+    const chat = await request(server).post("/api/chats").send({}).expect(201);
+    await request(server)
+      .post(`/api/chats/${chat.body.id}/mensagens`)
+      .send({ conteudo: "ping-nao-vira-texto" })
+      .expect(200);
+
+    const detalhe = await request(server)
+      .get(`/api/chats/${chat.body.id}`)
+      .expect(200);
+    expect(detalhe.body.titulo).toBe("ping-nao-vira-texto");
+
+    const textosDepois = await request(server).get("/api/textos").expect(200);
+    expect(textosDepois.body).toHaveLength(textosAntes.body.length);
+    expect(
+      textosDepois.body.some(
+        (t: { titulo: string }) => t.titulo === "ping-nao-vira-texto",
+      ),
+    ).toBe(false);
+  });
+
+  it("segundo pedido mantém o título e o histórico persistido", async () => {
+    const server = app.getHttpServer();
+    const chat = await request(server).post("/api/chats").send({}).expect(201);
+    await request(server)
+      .post(`/api/chats/${chat.body.id}/mensagens`)
+      .send({ conteudo: "primeira pergunta" })
+      .expect(200);
+    await request(server)
+      .post(`/api/chats/${chat.body.id}/mensagens`)
+      .send({ conteudo: "e depois disso?" })
+      .expect(200);
+
+    const detalhe = await request(server)
+      .get(`/api/chats/${chat.body.id}`)
+      .expect(200);
+    expect(detalhe.body.titulo).toBe("primeira pergunta");
+    expect(detalhe.body.mensagens.map((m: { role: string }) => m.role)).toEqual([
+      "user",
+      "assistant",
+      "user",
+      "assistant",
+    ]);
+    expect(detalhe.body.mensagens[0].conteudo).toBe("primeira pergunta");
+    expect(detalhe.body.mensagens[2].conteudo).toBe("e depois disso?");
+  });
 });

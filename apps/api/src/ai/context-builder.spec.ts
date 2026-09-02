@@ -35,4 +35,25 @@ describe("montarContexto", () => {
     });
     expect(fallback.textos).toHaveLength(2);
   });
+
+  it("não deixa o prompt passar de 8000 caracteres", () => {
+    const enorme = {
+      id: "cccccccc-cccc-cccc-cccc-cccccccccccc",
+      titulo: "Diário longo",
+      corpo: "lorem ".repeat(2000),
+    };
+    const extra = {
+      id: "dddddddd-dddd-dddd-dddd-dddddddddddd",
+      titulo: "Outro",
+      corpo: "mais um bloco ".repeat(2000),
+    };
+    const result = montarContexto({
+      pedido: "resumo geral do que está gravado",
+      textos: [enorme, extra],
+    });
+    expect(result.prompt.length).toBeLessThanOrEqual(8000);
+    expect(result.textos.length).toBeGreaterThan(0);
+    expect(result.textos[0]?.titulo).toBe("Diário longo");
+    expect(result.textos.some((t) => t.id === extra.id)).toBe(false);
+  });
 });

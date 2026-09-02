@@ -53,7 +53,7 @@ export class ChatsService {
   }
 
   async saveUserMessage(chatId: string, conteudo: string): Promise<Mensagem> {
-    await this.get(chatId);
+    const chat = await this.get(chatId);
     const msg = await this.mensagens.save(
       this.mensagens.create({
         chatId,
@@ -62,7 +62,12 @@ export class ChatsService {
         fontes: [],
       }),
     );
-    await this.chats.update(chatId, { updatedAt: new Date() });
+    const primeiraLinha = conteudo.split("\n")[0]?.trim().slice(0, 80);
+    const titulo =
+      chat.titulo === "Novo chat" && primeiraLinha
+        ? primeiraLinha
+        : chat.titulo;
+    await this.chats.update(chatId, { titulo, updatedAt: new Date() });
     return msg;
   }
 
@@ -79,13 +84,7 @@ export class ChatsService {
         fontes,
       }),
     );
-    const firstLine = conteudo.split("\n")[0]?.slice(0, 80);
-    if (firstLine) {
-      await this.chats.update(chatId, {
-        titulo: firstLine,
-        updatedAt: new Date(),
-      });
-    }
+    await this.chats.update(chatId, { updatedAt: new Date() });
     return msg;
   }
 }

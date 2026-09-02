@@ -28,11 +28,17 @@ export class ChatAiService {
       })),
       textoIds: input.textoIds,
     });
+    const chat = await this.chats.get(chatId);
+    const historico = (chat.mensagens ?? [])
+      .slice(0, -1)
+      .slice(-8)
+      .map((m) => ({ role: m.role, conteudo: m.conteudo }));
     let conteudo = "";
     const fontes: { textoId: string; titulo: string }[] = [];
     for await (const line of this.provider.stream({
       pedido: input.conteudo,
       textos: contexto.textos,
+      historico,
     })) {
       if (line.type === "token") {
         conteudo += line.text;
