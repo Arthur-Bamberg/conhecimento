@@ -3,7 +3,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 import { FormEvent, useEffect, useState } from "react";
-import type { Fonte, Mensagem } from "@conhecimento/contracts";
+import type { Escrita, Fonte } from "@conhecimento/contracts";
 import {
   createChat,
   getChat,
@@ -19,6 +19,7 @@ export default function ChatPage() {
   const [pedido, setPedido] = useState("");
   const [rascunho, setRascunho] = useState("");
   const [fontes, setFontes] = useState<Fonte[]>([]);
+  const [escritas, setEscritas] = useState<Escrita[]>([]);
   const [enviando, setEnviando] = useState(false);
   const [pedidoPendente, setPedidoPendente] = useState<string | null>(null);
   const [erroChat, setErroChat] = useState<ErroRelatorio | null>(null);
@@ -42,6 +43,7 @@ export default function ChatPage() {
   function limparRascunho() {
     setRascunho("");
     setFontes([]);
+    setEscritas([]);
     setPedidoPendente(null);
     setErroChat(null);
     setPedido("");
@@ -79,6 +81,7 @@ export default function ChatPage() {
     setPedido("");
     setRascunho("");
     setFontes([]);
+    setEscritas([]);
     setPedidoPendente(conteudo);
     setErroChat(null);
     setEnviando(true);
@@ -93,6 +96,12 @@ export default function ChatPage() {
             { textoId: line.textoId, titulo: line.titulo },
           ]);
         }
+        if (line.type === "escrita") {
+          setEscritas((prev) => [
+            ...prev,
+            { acao: line.acao, textoId: line.textoId, titulo: line.titulo },
+          ]);
+        }
         if (line.type === "error") {
           setErroChat({
             code: line.code,
@@ -103,8 +112,11 @@ export default function ChatPage() {
       }
       await queryClient.invalidateQueries({ queryKey: ["chat", chatId] });
       await queryClient.invalidateQueries({ queryKey: ["chats"] });
+      await queryClient.invalidateQueries({ queryKey: ["textos"] });
+      await queryClient.invalidateQueries({ queryKey: ["workspace"] });
       setRascunho("");
       setFontes([]);
+      setEscritas([]);
       setPedidoPendente(null);
     } catch (err) {
       setErroChat({
@@ -117,7 +129,7 @@ export default function ChatPage() {
     }
   }
 
-  const mensagens: Mensagem[] = detalhe.data?.mensagens ?? [];
+  const mensagens = detalhe.data?.mensagens ?? [];
   const userPendenteVisivel =
     Boolean(pedidoPendente) &&
     !mensagens.some(
@@ -190,7 +202,8 @@ export default function ChatPage() {
         <div className="shrink-0">
           <h1 className="text-2xl font-semibold">Chat</h1>
           <p className="mt-1 max-w-xl text-sm leading-relaxed text-muted">
-            Pergunte sobre os seus textos. A origem aparece como fonte.
+            Pergunte sobre os seus textos ou peça para gravar um. A origem
+            aparece como fonte.
           </p>
         </div>
         <div
@@ -200,31 +213,29 @@ export default function ChatPage() {
           {vazio ? (
             <p className="max-w-prose py-8 text-sm text-muted">
               Ainda não há mensagens. O assistente responde com base nos textos
-              gravados.
+              gravados e pode criar ou alterar um quando você pedir.
             </p>
           ) : null}
-          {mensagens.map((m) => (
-            <article key={m.id} data-role={m.role} className="max-w-prose">
-              <p className="mb-1 text-xs font-medium text-muted">
-                {m.role === "user" ? "Você" : "Resposta"}
-              </p>
-              {m.role === "assistant" ? (
+          {mensagens.map((m) =>
+            m.role === "user" ? (
+              <MensagemUsuario key={m.id}>{m.conteudo}</MensagemUsuario>
+            ) : (
+              <article
+                key={m.id}
+                data-role="assistant"
+                className="mr-auto max-w-prose"
+              >
+                <p className="mb-1 text-xs font-medium text-muted">Resposta</p>
                 <MarkdownBody>{m.conteudo}</MarkdownBody>
-              ) : (
-                <p className="whitespace-pre-wrap">{m.conteudo}</p>
-              )}
-              <FontesList fontes={m.fontes} />
-            </article>
-          ))}
+                <FontesList fontes={m.fontes} />
+                <EscritasList escritas={m.escritas ?? []} />
+              </article>
+            ),
+          )}
           {userPendenteVisivel ? (
-            <article
-              data-role="user"
-              data-testid="pedido-pendente"
-              className="max-w-prose"
-            >
-              <p className="mb-1 text-xs font-medium text-muted">Você</p>
-              <p className="whitespace-pre-wrap">{pedidoPendente}</p>
-            </article>
+            <MensagemUsuario testId="pedido-pendente">
+              {pedidoPendente ?? ""}
+            </MensagemUsuario>
           ) : null}
           {enviando && !rascunho ? (
             <p
@@ -236,10 +247,11 @@ export default function ChatPage() {
             </p>
           ) : null}
           {rascunho ? (
-            <article data-testid="rascunho" className="max-w-prose">
+            <article data-testid="rascunho" data-role="assistant" className="mr-auto max-w-prose">
               <p className="mb-1 text-xs font-medium text-muted">Resposta</p>
               <MarkdownBody>{rascunho}</MarkdownBody>
               <FontesList fontes={fontes} />
+              <EscritasList escritas={escritas} />
             </article>
           ) : null}
           {erroChat ? <RelatorioErro erro={erroChat} /> : null}
@@ -252,7 +264,7 @@ export default function ChatPage() {
             <span className="text-xs font-medium text-muted">Mensagem</span>
             <textarea
               className="field min-h-12 resize-none py-2"
-              placeholder="Pergunte sobre os seus textos"
+              placeholder="Pergunte ou peça para gravar um texto"
               rows={2}
               value={pedido}
               onChange={(e) => setPedido(e.target.value)}
@@ -292,6 +304,27 @@ function textoRelatorio(erro: ErroRelatorio): string {
   ].join("\n");
 }
 
+function MensagemUsuario({
+  children,
+  testId,
+}: {
+  children: string;
+  testId?: string;
+}) {
+  return (
+    <article
+      data-role="user"
+      data-testid={testId}
+      className="ml-auto flex w-fit max-w-[min(36rem,92%)] flex-col items-end"
+    >
+      <p className="mb-1 text-xs font-medium text-muted">Você</p>
+      <p className="rounded-lg bg-accent-soft px-3 py-2 text-accent-hover whitespace-pre-wrap">
+        {children}
+      </p>
+    </article>
+  );
+}
+
 function RelatorioErro({ erro }: { erro: ErroRelatorio }) {
   const [copiado, setCopiado] = useState(false);
   const relatorio = textoRelatorio(erro);
@@ -321,6 +354,34 @@ function RelatorioErro({ erro }: { erro: ErroRelatorio }) {
         {copiado ? "Copiado" : "Copiar relatório"}
       </button>
     </article>
+  );
+}
+
+function EscritasList({ escritas }: { escritas: Escrita[] }) {
+  if (escritas.length === 0) {
+    return null;
+  }
+  return (
+    <p
+      data-testid="escritas"
+      className="mt-2 flex flex-wrap items-baseline gap-x-2 gap-y-1 text-xs text-muted"
+    >
+      <span>Gravado:</span>
+      {escritas.map((e) => (
+        <Link
+          key={`${e.acao}-${e.textoId}`}
+          className="inline-flex min-h-8 items-center text-accent underline-offset-2 hover:underline"
+          href={`/textos/${e.textoId}`}
+          aria-label={
+            e.acao === "criar"
+              ? `Texto criado: ${e.titulo}`
+              : `Texto alterado: ${e.titulo}`
+          }
+        >
+          {e.titulo}
+        </Link>
+      ))}
+    </p>
   );
 }
 

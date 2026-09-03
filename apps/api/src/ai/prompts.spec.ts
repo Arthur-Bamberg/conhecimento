@@ -10,11 +10,16 @@ describe("prompts de chat", () => {
   it("pede resposta elaborada em markdown e inclui textos, pedido e histórico", () => {
     expect(INSTRUCAO_CHAT).toMatch(/markdown/i);
     expect(INSTRUCAO_CHAT).toMatch(/completa|útil|elaborad/i);
+    expect(INSTRUCAO_CHAT).toMatch(/:::escrita/);
+    expect(INSTRUCAO_CHAT).toMatch(/gravar|gravação/i);
+    expect(INSTRUCAO_CHAT).toMatch(/t[oó]pico|nota/i);
+    expect(INSTRUCAO_CHAT).toMatch(/não recuse/i);
 
     const prompt = montarPromptChat({
       pedido: "Qual o dia especial?",
       textos: [
         {
+          id: "550e8400-e29b-41d4-a716-446655440000",
           titulo: "Grande dia",
           corpo: "O dia especial é 01/01/2027.",
         },
@@ -26,6 +31,7 @@ describe("prompts de chat", () => {
     });
 
     expect(prompt).toContain("Grande dia");
+    expect(prompt).toContain("550e8400-e29b-41d4-a716-446655440000");
     expect(prompt).toContain("O dia especial é 01/01/2027.");
     expect(prompt).toContain("Qual o dia especial?");
     expect(prompt).toContain("tem alguma data marcada?");

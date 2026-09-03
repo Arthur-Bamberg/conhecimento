@@ -16,7 +16,7 @@ describe("createMensagemSchema", () => {
 });
 
 describe("streamLineSchema", () => {
-  it("aceita token, fonte, done e error", () => {
+  it("aceita token, fonte, escrita, done e error", () => {
     expect(
       streamLineSchema.parse({ type: "token", text: "Olá" }),
     ).toMatchObject({ type: "token", text: "Olá" });
@@ -27,6 +27,14 @@ describe("streamLineSchema", () => {
         titulo: "Agenda",
       }),
     ).toMatchObject({ type: "fonte", titulo: "Agenda" });
+    expect(
+      streamLineSchema.parse({
+        type: "escrita",
+        acao: "criar",
+        textoId: "550e8400-e29b-41d4-a716-446655440000",
+        titulo: "Caderno",
+      }),
+    ).toMatchObject({ type: "escrita", acao: "criar", titulo: "Caderno" });
     expect(streamLineSchema.parse({ type: "done" }).type).toBe("done");
     expect(
       streamLineSchema.parse({

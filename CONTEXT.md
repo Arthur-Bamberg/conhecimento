@@ -17,7 +17,7 @@ Recorte curto do conjunto de Textos, gerado pela IA. Aparece na lista de textos;
 _Avoid_: descrição coletiva, overview, digest, resumo geral
 
 **Chat**:
-Conversa com a IA que monta contexto a partir de textos (anexados e/ou busca lexical). É a interface da IA na fatia A.
+Conversa com a IA que monta contexto a partir de textos (anexados e/ou busca lexical) e pode gravar Textos (Escrita) quando a resposta cria ou altera um.
 _Avoid_: Ação de IA, painel generate/improve, agente, tool
 
 **Workspace**:
@@ -33,7 +33,7 @@ Porta que gera texto (stream ou síncrono). Runtime usa uma implementação real
 _Avoid_: SDK, Gemini (como nome da porta), modelo (como tipo de domínio)
 
 **Stream**:
-Resposta NDJSON de `POST /api/chats/:id/mensagens`. Linhas: `token`, `fonte`, `done` ou `error`.
+Resposta NDJSON de `POST /api/chats/:id/mensagens`. Linhas: `token`, `fonte`, `escrita`, `done` ou `error`.
 _Avoid_: WebSocket, EventSource/SSE, reconstruir fontes a partir dos tokens
 
 **Fonte**:
@@ -41,8 +41,12 @@ Texto citado na resposta do assistente (`textoId` + `titulo`), emitido como linh
 _Avoid_: citation genérica, RAG hit, attachment
 
 **Mensagem**:
-Turno persistido de um Chat (`user` | `assistant`), com `conteudo` e, no assistente, `fontes`.
+Turno persistido de um Chat (`user` | `assistant`), com `conteudo` e, no assistente, `fontes` e `escritas`.
 _Avoid_: prompt, completion, comment
+
+**Escrita**:
+Gravação de um Texto (criar ou alterar) feita pelo chat a partir da resposta da IA. Aparece na mensagem do assistente e como linha do stream.
+_Avoid_: Apply, proposta de bloco, PageVersion, tool call
 
 **Kanban**:
 Quadro de colunas e cards (fatia B). Não faz parte da A.
@@ -56,6 +60,3 @@ _Avoid_: Task do Notion, issue do GitHub (gestão)
 Ligação bidirecional entre um card e um texto (fatia B). Cardinalidade (1:1 vs N:N) fecha-se no feature-loop da B.
 _Avoid_: Attach, mention, hyperlink solto sem persistência
 
-**Apply**:
-Não existe neste produto. A IA do chat responde; não propõe operações de bloco para o usuário gravar.
-_Avoid_: Proposta, operação de bloco, PageVersion (recorte antigo)

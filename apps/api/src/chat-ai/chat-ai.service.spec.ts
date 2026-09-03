@@ -38,6 +38,13 @@ describe("ChatAiService", () => {
       chats as never,
       textos as never,
       provider,
+      {
+        gerar: async () => "",
+        gerarColecao: async () => "",
+      } as never,
+      {
+        atualizarSumario: async () => ({}),
+      } as never,
     );
 
     const lines = [];

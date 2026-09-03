@@ -20,7 +20,9 @@ function contemLexical(texto: TextoContexto, tokens: string[]): boolean {
 }
 
 function promptDoContexto(textos: TextoContexto[], pedido: string): string {
-  const blocos = textos.map((t) => `## ${t.titulo}\n${t.corpo}`).join("\n\n");
+  const blocos = textos
+    .map((t) => `## ${t.titulo}\n(id: ${t.id})\n${t.corpo}`)
+    .join("\n\n");
   return `Textos:\n${blocos}\n\nPedido:\n${pedido}`;
 }
 

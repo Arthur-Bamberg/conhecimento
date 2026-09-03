@@ -1,11 +1,12 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import type { StreamLine } from "@conhecimento/contracts";
 import type {
   AIProvider,
+  ProviderLine,
   StreamPedido,
   SumariarColecaoPedido,
   SumariarPedido,
 } from "./ai-provider";
+import { criarFiltroEscrita } from "./extrair-escritas";
 import { recorteColecao, recorteSumario } from "./recorte-sumario";
 import { resolverFontes } from "./resolver-fontes";
 import {
@@ -28,7 +29,7 @@ function modelo(key: string, systemInstruction?: string, maxOutputTokens = 8192)
 }
 
 export class GeminiProvider implements AIProvider {
-  async *stream(input: StreamPedido): AsyncIterable<StreamLine> {
+  async *stream(input: StreamPedido): AsyncIterable<ProviderLine> {
     const key = process.env.GEMINI_API_KEY;
     if (!key) {
       yield {
@@ -47,6 +48,7 @@ export class GeminiProvider implements AIProvider {
       const result = await modelo(key, INSTRUCAO_CHAT).generateContentStream(
         prompt,
       );
+      const filtro = criarFiltroEscrita();
       let resposta = "";
       for await (const chunk of result.stream) {
         let text = "";
@@ -55,10 +57,22 @@ export class GeminiProvider implements AIProvider {
         } catch {
           continue;
         }
-        if (text) {
-          resposta += text;
-          yield { type: "token", text };
+        if (!text) {
+          continue;
         }
+        const emit = filtro.push(text);
+        if (emit) {
+          resposta += emit;
+          yield { type: "token", text: emit };
+        }
+      }
+      const fim = filtro.finish();
+      if (fim.resto) {
+        resposta += fim.resto;
+        yield { type: "token", text: fim.resto };
+      }
+      for (const proposta of fim.propostas) {
+        yield proposta;
       }
       for (const fonte of resolverFontes({
         resposta,

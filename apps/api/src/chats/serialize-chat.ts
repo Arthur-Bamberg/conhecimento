@@ -18,6 +18,7 @@ export function serializeChatDetalhe(chat: Chat) {
       role: m.role,
       conteudo: m.conteudo,
       fontes: m.fontes ?? [],
+      escritas: m.escritas ?? [],
       createdAt: m.createdAt.toISOString(),
     })),
   };

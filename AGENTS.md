@@ -40,7 +40,7 @@ Este plano **substitui** o recorte antigo em `personal/.scratch/feature-loop/pla
 | Superfície A | **Web desktop (browser)** |
 | Cliente web | **Next.js** App Router (`apps/web`); Expo na D |
 | Corpo do texto | **Markdown** (`titulo` + `corpo`) |
-| Stream | **POST + NDJSON** (`token` / `fonte` / `done` / `error`) |
+| Stream | **POST + NDJSON** (`token` / `fonte` / `escrita` / `done` / `error`) |
 | Provider runtime | Porta `AIProvider`; Gemini no runtime; **Fake** se `AI_PROVIDER=fake` |
 | Pacotes | pnpm: `apps/api`, `apps/web`, `packages/contracts` |
 | Decisões A | `.scratch/feature-loop/mvp-a-chat-textos/decisions.md` |

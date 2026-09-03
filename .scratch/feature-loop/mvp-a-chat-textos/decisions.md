@@ -181,6 +181,16 @@ Greenfield no repo `conhecimento`: chat web sobre **Textos** (título + corpo), 
 - **Depende de:** D4, D7, D12, D17.
 - **Status:** confirmado
 
+### D19 — Escrita de Texto pelo chat
+- **Pergunta:** O chat pode gravar Textos a partir da resposta da IA?
+- **Opções:**
+  - A: **Sim, auto-aplica no servidor.** Provider emite `escrita_proposta` (Fake: padrão de pedido; Gemini: bloco `:::escrita` no fim da resposta). `ChatAiService` cria/altera via `TextosService`, regenera sumários, emite `{ type: "escrita", acao, textoId, titulo }` e persiste em `Mensagem.escritas`. Pedido comum não grava.
+  - B: Proposta na UI para a pessoa confirmar (Apply de blocos)
+  - C: Não; o chat só responde
+- **Recomendado:** A — o pedido é gravar conforme o que a IA retornar; B reabre o recorte antigo; C é o comportamento anterior.
+- **Depende de:** D6, D7, D12, D13.
+- **Status:** confirmado
+
 ## Revisão global
 
 - Data/hora da passagem 2: 2026-08-30 ~13:35 America/Sao_Paulo
@@ -193,4 +203,4 @@ Greenfield no repo `conhecimento`: chat web sobre **Textos** (título + corpo), 
 - Riscos remanescentes:
   - Gemini real pode ignorar “cite o texto”; Fake cobre o e2e; demo manual com chave é best-effort.
   - LazyModuleLoader + TypeORM no módulo lazy: `ChatModule` usa `TypeOrm.forFeature` das entidades de chat na mesma conexão.
-- ADRs: Next.js não Expo; POST+NDJSON; markdown não blocos; ChatModule lazy; sumário pela IA.
+- ADRs: Next.js não Expo; POST+NDJSON; markdown não blocos; ChatModule lazy; sumário pela IA; chat grava Texto (Escrita).

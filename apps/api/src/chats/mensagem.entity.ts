@@ -6,7 +6,7 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from "typeorm";
-import type { Fonte } from "@conhecimento/contracts";
+import type { Escrita, Fonte } from "@conhecimento/contracts";
 import { Chat } from "./chat.entity";
 
 @Entity({ name: "mensagens" })
@@ -29,6 +29,9 @@ export class Mensagem {
 
   @Column({ type: "jsonb", default: [] })
   fontes!: Fonte[];
+
+  @Column({ type: "jsonb", default: [] })
+  escritas!: Escrita[];
 
   @CreateDateColumn({ name: "created_at", type: "timestamptz" })
   createdAt!: Date;

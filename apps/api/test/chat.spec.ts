@@ -86,6 +86,99 @@ describe("chat HTTP", () => {
     ).toBe(false);
   });
 
+  it("cria um texto quando o pedido pede gravar", async () => {
+    const server = app.getHttpServer();
+    const chat = await request(server).post("/api/chats").send({}).expect(201);
+    const res = await request(server)
+      .post(`/api/chats/${chat.body.id}/mensagens`)
+      .send({
+        conteudo:
+          "Crie um texto chamado Caderno de bordo com o corpo Notas da semana.",
+      })
+      .expect(200);
+
+    const lines = parseNdjson(res.text);
+    const escrita = lines.find((l) => l.type === "escrita");
+    expect(escrita).toMatchObject({
+      type: "escrita",
+      acao: "criar",
+      titulo: "Caderno de bordo",
+    });
+
+    const textos = await request(server).get("/api/textos").expect(200);
+    const criado = textos.body.find(
+      (t: { titulo: string }) => t.titulo === "Caderno de bordo",
+    );
+    expect(criado).toMatchObject({
+      titulo: "Caderno de bordo",
+      corpo: "Notas da semana.",
+    });
+
+    const detalhe = await request(server)
+      .get(`/api/chats/${chat.body.id}`)
+      .expect(200);
+    expect(detalhe.body.mensagens[1].escritas[0]).toMatchObject({
+      acao: "criar",
+      titulo: "Caderno de bordo",
+      textoId: criado.id,
+    });
+  });
+
+  it("altera um texto existente quando o pedido pede alterar", async () => {
+    const server = app.getHttpServer();
+    const texto = await request(server)
+      .post("/api/textos")
+      .send({ titulo: "Receitas", corpo: "Bolo de chocolate com café." })
+      .expect(201);
+    const chat = await request(server).post("/api/chats").send({}).expect(201);
+    const res = await request(server)
+      .post(`/api/chats/${chat.body.id}/mensagens`)
+      .send({
+        conteudo: "Altere o texto Receitas para o corpo Bolo de cenoura.",
+      })
+      .expect(200);
+
+    const lines = parseNdjson(res.text);
+    expect(lines.find((l) => l.type === "escrita")).toMatchObject({
+      type: "escrita",
+      acao: "alterar",
+      textoId: texto.body.id,
+      titulo: "Receitas",
+    });
+
+    const atualizado = await request(server)
+      .get(`/api/textos/${texto.body.id}`)
+      .expect(200);
+    expect(atualizado.body.corpo).toBe("Bolo de cenoura.");
+  });
+
+  it("cria um texto a partir de um pedido de tópico", async () => {
+    const server = app.getHttpServer();
+    const chat = await request(server).post("/api/chats").send({}).expect(201);
+    const res = await request(server)
+      .post(`/api/chats/${chat.body.id}/mensagens`)
+      .send({
+        conteudo:
+          "Crie um novo tópico sobre configurar landing page bambergsoftware",
+      })
+      .expect(200);
+
+    const escrita = parseNdjson(res.text).find((l) => l.type === "escrita");
+    expect(escrita).toMatchObject({
+      type: "escrita",
+      acao: "criar",
+      titulo: "Configurar landing page bambergsoftware",
+    });
+
+    const textos = await request(server).get("/api/textos").expect(200);
+    expect(
+      textos.body.some(
+        (t: { titulo: string }) =>
+          t.titulo === "Configurar landing page bambergsoftware",
+      ),
+    ).toBe(true);
+  });
+
   it("segundo pedido mantém o título e o histórico persistido", async () => {
     const server = app.getHttpServer();
     const chat = await request(server).post("/api/chats").send({}).expect(201);

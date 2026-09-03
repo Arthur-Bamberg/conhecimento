@@ -1,10 +1,13 @@
 import type { StreamLine } from "@conhecimento/contracts";
 import type { TextoContexto } from "./context-builder";
+import type { EscritaProposta } from "./extrair-escritas";
 
 export type TurnoHistorico = {
   role: "user" | "assistant";
   conteudo: string;
 };
+
+export type ProviderLine = StreamLine | EscritaProposta;
 
 export type StreamPedido = {
   pedido: string;
@@ -22,7 +25,7 @@ export type SumariarColecaoPedido = {
 };
 
 export interface AIProvider {
-  stream(input: StreamPedido): AsyncIterable<StreamLine>;
+  stream(input: StreamPedido): AsyncIterable<ProviderLine>;
   sumariar(input: SumariarPedido): Promise<string>;
   sumariarColecao(input: SumariarColecaoPedido): Promise<string>;
 }

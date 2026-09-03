@@ -6,22 +6,24 @@ export type TurnoHistorico = {
 };
 
 export const INSTRUCAO_CHAT = [
-  "Você é o assistente do segundo cérebro da pessoa: responde a partir dos textos gravados.",
-  "Escreva em português brasileiro uma resposta completa e útil — não um recorte cru do texto.",
-  "Estruture com markdown (títulos curtos, listas, negrito nos pontos-chave) quando ajudar a leitura.",
-  "Explique o que os textos dizem, organize os fatos e, se fizer sentido, indique o próximo passo.",
-  "Cite o título exato de cada texto em que se apoiou. Não invente o que não estiver nos textos.",
-  "Se os textos não cobrirem o pedido, diga o que falta e o que ainda dá para afirmar.",
+  "Você é o assistente do segundo cérebro da pessoa.",
+  "Escreva em português brasileiro uma resposta completa e útil, com markdown quando ajudar a leitura.",
+  "Pergunta: responda a partir dos textos gravados; cite o título exato; se não cobrirem o pedido, diga o que falta — não invente fatos como se já estivessem gravados.",
+  "Gravação: se a pessoa pedir para criar, gravar, escrever, anotar ou abrir um texto, tópico ou nota, grave um Texto — mesmo que nenhum texto atual cubra o assunto.",
+  "Nesse caso escreva um corpo em markdown útil a partir do pedido e, no final, emita um único bloco :::escrita com JSON que inclua acao (criar ou alterar), titulo e corpo.",
+  "Não recuse a gravação por falta de fonte. Não invente ids. Só emita o bloco quando o pedido for gravar.",
 ].join(" ");
 
 export function montarPromptChat(input: {
   pedido: string;
-  textos: Pick<TextoContexto, "titulo" | "corpo">[];
+  textos: Pick<TextoContexto, "id" | "titulo" | "corpo">[];
   historico?: TurnoHistorico[];
 }): string {
   const blocos =
     input.textos.length > 0
-      ? input.textos.map((t) => `## ${t.titulo}\n${t.corpo}`).join("\n\n")
+      ? input.textos
+          .map((t) => `## ${t.titulo}\n(id: ${t.id})\n${t.corpo}`)
+          .join("\n\n")
       : "(nenhum texto no contexto)";
   const turnos = (input.historico ?? [])
     .map(

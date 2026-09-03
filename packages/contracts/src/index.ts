@@ -37,12 +37,19 @@ export const fonteSchema = z.object({
   titulo: z.string(),
 });
 
+export const escritaSchema = z.object({
+  acao: z.enum(["criar", "alterar"]),
+  textoId: uuidSchema,
+  titulo: z.string(),
+});
+
 export const mensagemSchema = z.object({
   id: uuidSchema,
   chatId: uuidSchema,
   role: z.enum(["user", "assistant"]),
   conteudo: z.string(),
   fontes: z.array(fonteSchema),
+  escritas: z.array(escritaSchema),
   createdAt: z.string(),
 });
 
@@ -66,6 +73,12 @@ export const streamLineSchema = z.discriminatedUnion("type", [
   z.object({ type: z.literal("token"), text: z.string() }),
   z.object({
     type: z.literal("fonte"),
+    textoId: uuidSchema,
+    titulo: z.string(),
+  }),
+  z.object({
+    type: z.literal("escrita"),
+    acao: z.enum(["criar", "alterar"]),
     textoId: uuidSchema,
     titulo: z.string(),
   }),
@@ -93,3 +106,4 @@ export type StreamLine = z.infer<typeof streamLineSchema>;
 export type Chat = z.infer<typeof chatSchema>;
 export type Mensagem = z.infer<typeof mensagemSchema>;
 export type Fonte = z.infer<typeof fonteSchema>;
+export type Escrita = z.infer<typeof escritaSchema>;

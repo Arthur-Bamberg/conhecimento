@@ -60,6 +60,7 @@ export class ChatsService {
         role: "user",
         conteudo,
         fontes: [],
+        escritas: [],
       }),
     );
     const primeiraLinha = conteudo.split("\n")[0]?.trim().slice(0, 80);
@@ -75,6 +76,7 @@ export class ChatsService {
     chatId: string,
     conteudo: string,
     fontes: Mensagem["fontes"],
+    escritas: Mensagem["escritas"] = [],
   ): Promise<Mensagem> {
     const msg = await this.mensagens.save(
       this.mensagens.create({
@@ -82,6 +84,7 @@ export class ChatsService {
         role: "assistant",
         conteudo,
         fontes,
+        escritas,
       }),
     );
     await this.chats.update(chatId, { updatedAt: new Date() });
