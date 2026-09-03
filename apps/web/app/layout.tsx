@@ -18,7 +18,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Conhecimento",
   description:
-    "Textos e chat — Arthur Bamberg / A Bamberg Desenvolvimento de Software",
+    "Textos e chat — Arthur Bamberg / Bamberg Desenvolvimento de Software",
 };
 
 export const viewport: Viewport = {
@@ -36,33 +36,39 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body
-        className="flex min-h-dvh flex-col bg-background font-sans text-foreground"
+        className="flex h-dvh flex-col overflow-hidden bg-background font-sans text-foreground"
         suppressHydrationWarning
       >
         <Providers>
-          <header className="border-b border-border bg-surface/90 backdrop-blur">
-            <div className="mx-auto flex w-full max-w-5xl items-center justify-between gap-4 px-4 py-3">
-              <Link href="/textos" className="min-w-0">
-                <span className="block font-semibold tracking-tight">
-                  Conhecimento
-                </span>
-                <span className="mt-0.5 hidden truncate text-xs text-muted sm:block">
-                  Arthur Bamberg · A Bamberg Desenvolvimento de Software
+          <a href="#conteudo" className="skip-link">
+            Ir para o conteúdo
+          </a>
+          <header className="z-40 shrink-0 border-b border-border bg-background">
+            <div className="mx-auto flex w-full max-w-5xl items-stretch justify-between gap-4 px-4">
+              <Link href="/textos" className="min-w-0 self-center py-3">
+                <span className="block font-semibold">Conhecimento</span>
+                <span className="mt-0.5 block truncate text-xs text-muted">
+                  Arthur Bamberg · Bamberg Desenvolvimento de Software
                 </span>
               </Link>
               <ShellNav />
             </div>
           </header>
-          <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col px-4 py-8">
+          <main
+            id="conteudo"
+            tabIndex={-1}
+            className="mx-auto flex min-h-0 w-full max-w-5xl flex-1 flex-col overflow-y-auto px-4 py-6 outline-none"
+          >
             {children}
           </main>
-          <footer className="mt-auto border-t border-border bg-surface/80">
-            <div className="mx-auto flex w-full max-w-5xl flex-col gap-1 px-4 py-4 text-xs text-muted">
+          <footer className="shrink-0 border-t border-border bg-background">
+            <div className="mx-auto flex w-full max-w-5xl flex-col gap-1 px-4 py-4 text-sm text-muted">
               <p>
-                Arthur Bamberg · A Bamberg Desenvolvimento de Software
+                Arthur Bamberg · Bamberg Desenvolvimento de Software
               </p>
               <p>
-                Tecnologia · Canoas, RS · CNPJ 63.801.318/0001-91 · (51) 9978-4248
+                Tecnologia · Canoas, RS · CNPJ 63.801.318/0001-91 · (51)
+                9978-4248
               </p>
             </div>
           </footer>

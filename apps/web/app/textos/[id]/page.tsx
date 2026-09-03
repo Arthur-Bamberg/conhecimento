@@ -6,6 +6,7 @@ import { useParams, useRouter } from "next/navigation";
 import { FormEvent, useEffect, useState } from "react";
 import { deleteTexto, getTexto, patchTexto } from "../../../lib/api";
 import { MarkdownBody } from "../../../lib/markdown";
+import { IconArrowLeft } from "../../icons";
 
 export default function TextoEditorPage() {
   const params = useParams<{ id: string }>();
@@ -48,20 +49,52 @@ export default function TextoEditorPage() {
     salvar.mutate();
   }
 
+  function onApagar() {
+    if (
+      !window.confirm(
+        `Apagar «${titulo || texto.data?.titulo}»? Esta ação não tem volta.`,
+      )
+    ) {
+      return;
+    }
+    apagar.mutate();
+  }
+
   if (texto.isLoading) {
-    return <p className="text-sm text-muted">A carregar…</p>;
+    return (
+      <div aria-busy="true" aria-live="polite" className="flex flex-col gap-4">
+        <p className="sr-only">A carregar…</p>
+        <div className="skeleton h-5 w-24" />
+        <div className="skeleton h-12 w-full" />
+        <div className="skeleton h-64 w-full" />
+      </div>
+    );
   }
   if (texto.isError) {
-    return <p className="text-sm text-danger">Texto não encontrado.</p>;
+    return (
+      <div className="flex flex-col gap-3">
+        <Link
+          href="/textos"
+          className="inline-flex w-fit min-h-11 items-center gap-1.5 text-sm font-medium text-accent hover:underline"
+        >
+          <IconArrowLeft className="size-4" />
+          Voltar aos textos
+        </Link>
+        <p role="alert" className="text-sm text-danger">
+          Texto não encontrado. Volte à lista e escolha outro.
+        </p>
+      </div>
+    );
   }
 
   return (
     <form onSubmit={onSubmit} className="flex flex-col gap-5">
       <Link
         href="/textos"
-        className="w-fit text-sm font-medium text-accent hover:underline"
+        className="inline-flex w-fit min-h-11 items-center gap-1.5 text-sm font-medium text-accent hover:underline"
       >
-        ← Textos
+        <IconArrowLeft className="size-4" />
+        Voltar aos textos
       </Link>
       <label className="flex flex-col gap-1.5 text-sm font-medium">
         Título
@@ -73,20 +106,25 @@ export default function TextoEditorPage() {
           required
         />
       </label>
-      <p className="text-sm text-muted">
-        <span className="font-medium text-foreground">Sumário · IA. </span>
+      <p className="max-w-prose text-sm leading-relaxed text-muted">
+        <span className="font-medium text-foreground">Sumário. </span>
         {texto.data?.sumario || "Gerado automaticamente ao salvar."}
       </p>
       <div className="flex flex-col gap-2">
         <div className="flex items-center justify-between gap-3">
           <span className="text-sm font-medium">Conteúdo</span>
-          <div className="flex rounded-full border border-border bg-surface p-0.5 text-sm">
+          <div
+            className="flex gap-1 text-sm"
+            role="group"
+            aria-label="Modo do conteúdo"
+          >
             <button
               type="button"
+              aria-pressed={!preview}
               className={
                 !preview
-                  ? "rounded-full bg-accent-soft px-3 py-1 font-medium text-accent"
-                  : "rounded-full px-3 py-1 text-muted"
+                  ? "min-h-11 px-2 font-medium text-foreground"
+                  : "min-h-11 px-2 text-muted transition-colors duration-200 hover:text-foreground"
               }
               onClick={() => setPreview(false)}
             >
@@ -94,10 +132,11 @@ export default function TextoEditorPage() {
             </button>
             <button
               type="button"
+              aria-pressed={preview}
               className={
                 preview
-                  ? "rounded-full bg-accent-soft px-3 py-1 font-medium text-accent"
-                  : "rounded-full px-3 py-1 text-muted"
+                  ? "min-h-11 px-2 font-medium text-foreground"
+                  : "min-h-11 px-2 text-muted transition-colors duration-200 hover:text-foreground"
               }
               onClick={() => setPreview(true)}
             >
@@ -106,7 +145,7 @@ export default function TextoEditorPage() {
           </div>
         </div>
         {preview ? (
-          <MarkdownBody className="card min-h-64 max-w-none p-4">
+          <MarkdownBody className="min-h-64 max-w-prose border border-border px-3 py-3">
             {corpo || "*Vazio*"}
           </MarkdownBody>
         ) : (
@@ -132,16 +171,20 @@ export default function TextoEditorPage() {
         <button
           type="button"
           className="btn-danger"
-          onClick={() => apagar.mutate()}
+          onClick={onApagar}
           disabled={apagar.isPending}
         >
           Apagar
         </button>
         {salvar.isSuccess ? (
-          <span className="text-sm text-accent">Salvo.</span>
+          <span aria-live="polite" className="text-sm text-accent">
+            Salvo.
+          </span>
         ) : null}
         {salvar.isError ? (
-          <span className="text-sm text-danger">Não foi possível salvar.</span>
+          <span role="alert" className="text-sm text-danger">
+            Não foi possível salvar. Tente de novo.
+          </span>
         ) : null}
       </div>
     </form>

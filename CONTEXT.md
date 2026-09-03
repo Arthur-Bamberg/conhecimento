@@ -1,6 +1,6 @@
 # Conhecimento
 
-Textos organizados num workspace, usados principalmente por **chat com IA**. Kanban e vínculo com tarefas entram na fatia B. Segundo cérebro pessoal de Arthur Bamberg; o núcleo é o que a A Bamberg Desenvolvimento de Software pode oferecer depois.
+Textos organizados num workspace, usados principalmente por **chat com IA**. Kanban e vínculo com tarefas entram na fatia B. Segundo cérebro pessoal de Arthur Bamberg; o núcleo é o que a Bamberg Desenvolvimento de Software pode oferecer depois.
 
 ## Language
 

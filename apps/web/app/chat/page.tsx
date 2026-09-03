@@ -11,6 +11,7 @@ import {
   streamMensagem,
 } from "../../lib/api";
 import { MarkdownBody } from "../../lib/markdown";
+import { IconPlus } from "../icons";
 
 export default function ChatPage() {
   const queryClient = useQueryClient();
@@ -130,10 +131,10 @@ export default function ChatPage() {
     !erroChat;
 
   return (
-    <div className="flex min-h-[70vh] flex-col gap-4 lg:flex-row lg:items-stretch">
+    <div className="grid min-h-0 flex-1 grid-rows-[auto_minmax(0,1fr)] overflow-hidden lg:grid-cols-[13.5rem_minmax(0,1fr)] lg:grid-rows-none">
       <aside
         data-testid="lista-chats"
-        className="card flex max-h-48 w-full shrink-0 flex-col overflow-hidden p-2 lg:max-h-none lg:w-60"
+        className="flex min-h-0 flex-col border-b border-border pb-3 lg:border-r lg:border-b-0 lg:pr-4 lg:pb-0"
       >
         <button
           type="button"
@@ -141,22 +142,27 @@ export default function ChatPage() {
           onClick={() => novoChat.mutate()}
           disabled={novoChat.isPending || enviando}
         >
+          <IconPlus className="size-4" />
           Nova conversa
         </button>
-        <p className="mt-3 px-2 text-xs font-medium tracking-wide text-muted uppercase">
-          Conversas
-        </p>
         <nav
           aria-label="Conversas"
-          className="mt-1 min-h-0 flex-1 overflow-y-auto"
+          className="mt-2 flex min-h-0 gap-1 overflow-x-auto lg:flex-1 lg:flex-col lg:overflow-y-auto"
         >
           {chats.isPending ? (
-            <p className="px-2 py-2 text-sm text-muted">A carregar…</p>
+            <p className="px-1 py-2 text-sm text-muted">A carregar…</p>
           ) : null}
           {chats.isError ? (
-            <p className="px-2 py-2 text-sm text-danger">
-              Não foi possível carregar as conversas.
-            </p>
+            <div role="alert" className="flex flex-col gap-2 px-1 py-2 text-sm text-danger">
+              <p>Não foi possível carregar as conversas. Recarregue a página.</p>
+              <button
+                type="button"
+                className="btn-ghost self-start text-foreground"
+                onClick={() => void chats.refetch()}
+              >
+                Tentar de novo
+              </button>
+            </div>
           ) : null}
           {(chats.data ?? []).map((chat) => {
             const ativo = chat.id === chatId;
@@ -169,8 +175,8 @@ export default function ChatPage() {
                 disabled={enviando}
                 className={
                   ativo
-                    ? "flex w-full rounded-xl bg-accent-soft px-3 py-2 text-left text-sm font-medium text-accent"
-                    : "flex w-full rounded-xl px-3 py-2 text-left text-sm text-foreground hover:bg-surface"
+                    ? "flex min-h-11 w-max max-w-56 shrink-0 items-center px-2 py-2 text-left text-sm font-medium text-foreground lg:w-full lg:max-w-none"
+                    : "flex min-h-11 w-max max-w-56 shrink-0 items-center px-2 py-2 text-left text-sm text-muted transition-colors duration-200 hover:text-foreground lg:w-full lg:max-w-none"
                 }
                 onClick={() => selecionarChat(chat.id)}
               >
@@ -180,93 +186,92 @@ export default function ChatPage() {
           })}
         </nav>
       </aside>
-      <div className="flex min-w-0 flex-1 flex-col gap-5">
-        <div>
-          <h1 className="text-3xl font-semibold tracking-tight">Chat</h1>
-          <p className="mt-1 max-w-xl text-sm text-muted">
+      <div className="flex min-h-0 min-w-0 flex-col overflow-hidden pt-4 lg:pt-0 lg:pl-6">
+        <div className="shrink-0">
+          <h1 className="text-2xl font-semibold">Chat</h1>
+          <p className="mt-1 max-w-xl text-sm leading-relaxed text-muted">
             Pergunte sobre os seus textos. A origem aparece como fonte.
           </p>
         </div>
         <div
           data-testid="mensagens"
-          className="card flex flex-1 flex-col gap-3 overflow-y-auto p-4"
+          className="mt-4 flex min-h-0 flex-1 flex-col gap-6 overflow-y-auto py-2"
         >
-        {vazio ? (
-          <p className="m-auto max-w-sm py-10 text-center text-sm text-muted">
-            Ainda não há mensagens. O assistente responde com base nos textos
-            gravados.
-          </p>
-        ) : null}
-        {mensagens.map((m) => (
-          <article
-            key={m.id}
-            data-role={m.role}
-            className={
-              m.role === "user"
-                ? "max-w-[85%] self-end rounded-2xl bg-accent px-3.5 py-2.5 text-accent-fg"
-                : "max-w-[85%] self-start rounded-2xl bg-surface px-3.5 py-2.5"
-            }
-          >
-            {m.role === "assistant" ? (
-              <MarkdownBody>{m.conteudo}</MarkdownBody>
-            ) : (
-              <p className="whitespace-pre-wrap">{m.conteudo}</p>
-            )}
-            <FontesList fontes={m.fontes} inverted={m.role === "user"} />
-          </article>
-        ))}
-        {userPendenteVisivel ? (
-          <article
-            data-role="user"
-            data-testid="pedido-pendente"
-            className="max-w-[85%] self-end rounded-2xl bg-accent px-3.5 py-2.5 text-accent-fg"
-          >
-            <p className="whitespace-pre-wrap">{pedidoPendente}</p>
-          </article>
-        ) : null}
-        {enviando && !rascunho ? (
-          <article
-            data-testid="aguardando"
-            aria-live="polite"
-            className="max-w-[85%] self-start rounded-2xl bg-surface px-3.5 py-2.5 text-sm text-muted"
-          >
-            Aguardando a IA…
-          </article>
-        ) : null}
-        {rascunho ? (
-          <article
-            data-testid="rascunho"
-            className="max-w-[85%] self-start rounded-2xl bg-surface px-3.5 py-2.5"
-          >
-            <MarkdownBody>{rascunho}</MarkdownBody>
-            <FontesList fontes={fontes} />
-          </article>
-        ) : null}
-        {erroChat ? <RelatorioErro erro={erroChat} /> : null}
-      </div>
-      <form onSubmit={onSubmit} className="card flex items-end gap-2 p-2">
-        <textarea
-          aria-label="Mensagem"
-          className="min-h-12 flex-1 resize-none rounded-xl bg-transparent px-3 py-2 outline-none"
-          placeholder="Pergunte sobre os seus textos"
-          rows={2}
-          value={pedido}
-          onChange={(e) => setPedido(e.target.value)}
-          onKeyDown={(event) => {
-            if (event.key === "Enter" && !event.shiftKey) {
-              event.preventDefault();
-              event.currentTarget.form?.requestSubmit();
-            }
-          }}
-        />
-        <button
-          type="submit"
-          className="btn-primary self-end"
-          disabled={enviando || !chatId}
+          {vazio ? (
+            <p className="max-w-prose py-8 text-sm text-muted">
+              Ainda não há mensagens. O assistente responde com base nos textos
+              gravados.
+            </p>
+          ) : null}
+          {mensagens.map((m) => (
+            <article key={m.id} data-role={m.role} className="max-w-prose">
+              <p className="mb-1 text-xs font-medium text-muted">
+                {m.role === "user" ? "Você" : "Resposta"}
+              </p>
+              {m.role === "assistant" ? (
+                <MarkdownBody>{m.conteudo}</MarkdownBody>
+              ) : (
+                <p className="whitespace-pre-wrap">{m.conteudo}</p>
+              )}
+              <FontesList fontes={m.fontes} />
+            </article>
+          ))}
+          {userPendenteVisivel ? (
+            <article
+              data-role="user"
+              data-testid="pedido-pendente"
+              className="max-w-prose"
+            >
+              <p className="mb-1 text-xs font-medium text-muted">Você</p>
+              <p className="whitespace-pre-wrap">{pedidoPendente}</p>
+            </article>
+          ) : null}
+          {enviando && !rascunho ? (
+            <p
+              data-testid="aguardando"
+              aria-live="polite"
+              className="text-sm text-muted"
+            >
+              Aguardando a IA…
+            </p>
+          ) : null}
+          {rascunho ? (
+            <article data-testid="rascunho" className="max-w-prose">
+              <p className="mb-1 text-xs font-medium text-muted">Resposta</p>
+              <MarkdownBody>{rascunho}</MarkdownBody>
+              <FontesList fontes={fontes} />
+            </article>
+          ) : null}
+          {erroChat ? <RelatorioErro erro={erroChat} /> : null}
+        </div>
+        <form
+          onSubmit={onSubmit}
+          className="sticky bottom-0 z-20 mt-3 flex shrink-0 items-end gap-2 border-t border-border bg-background pt-3 pb-[max(0.25rem,env(safe-area-inset-bottom))]"
         >
-          {enviando ? "Enviando…" : "Enviar"}
-        </button>
-      </form>
+          <label className="flex min-w-0 flex-1 flex-col gap-1">
+            <span className="text-xs font-medium text-muted">Mensagem</span>
+            <textarea
+              className="field min-h-12 resize-none py-2"
+              placeholder="Pergunte sobre os seus textos"
+              rows={2}
+              value={pedido}
+              onChange={(e) => setPedido(e.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" && !event.shiftKey) {
+                  event.preventDefault();
+                  event.currentTarget.form?.requestSubmit();
+                }
+              }}
+            />
+          </label>
+          <button
+            type="submit"
+            className="btn-primary self-end"
+            disabled={enviando || !chatId}
+          >
+            {enviando ? "Enviando…" : "Enviar"}
+          </button>
+        </form>
       </div>
     </div>
   );
@@ -304,12 +309,12 @@ function RelatorioErro({ erro }: { erro: ErroRelatorio }) {
     <article
       data-testid="erro-ia"
       role="alert"
-      className="max-w-full self-stretch rounded-2xl border border-danger/35 bg-danger-soft px-3.5 py-3"
+      className="max-w-prose border border-danger/35 bg-danger-soft px-3 py-3"
     >
       <p className="text-sm font-medium text-danger">
         A IA não respondeu. Copie o relatório e envie aos desenvolvedores.
       </p>
-      <pre className="mt-2 max-h-48 overflow-auto whitespace-pre-wrap break-words rounded-xl bg-surface px-3 py-2 font-mono text-xs text-foreground">
+      <pre className="mt-2 max-h-48 overflow-auto whitespace-pre-wrap break-words bg-background px-3 py-2 font-mono text-xs text-foreground">
         {relatorio}
       </pre>
       <button type="button" className="btn-ghost mt-2 text-sm" onClick={() => void copiar()}>
@@ -319,27 +324,17 @@ function RelatorioErro({ erro }: { erro: ErroRelatorio }) {
   );
 }
 
-function FontesList({
-  fontes,
-  inverted = false,
-}: {
-  fontes: Fonte[];
-  inverted?: boolean;
-}) {
+function FontesList({ fontes }: { fontes: Fonte[] }) {
   if (fontes.length === 0) {
     return null;
   }
   return (
-    <p className={`mt-2 flex flex-wrap gap-1.5 text-xs ${inverted ? "text-accent-fg/80" : "text-muted"}`}>
-      <span className="self-center">Fonte:</span>
+    <p className="mt-2 flex flex-wrap items-baseline gap-x-2 gap-y-1 text-xs text-muted">
+      <span>Fonte:</span>
       {fontes.map((f) => (
         <Link
           key={f.textoId}
-          className={
-            inverted
-              ? "rounded-full bg-accent-fg/15 px-2 py-0.5 underline-offset-2 hover:underline"
-              : "rounded-full bg-accent-soft px-2 py-0.5 text-accent hover:underline"
-          }
+          className="inline-flex min-h-8 items-center text-accent underline-offset-2 hover:underline"
           href={`/textos/${f.textoId}`}
         >
           {f.titulo}

@@ -4,7 +4,7 @@ Guia para agentes (Cursor) neste repositório. Leia isto e [`CONTEXT.md`](./CONT
 
 ## O que é
 
-**conhecimento**: textos + chat com IA no browser; kanban entra na fatia B. Âncora: segundo cérebro de **Arthur Bamberg** primeiro; o mesmo núcleo vira oferta da **A Bamberg Desenvolvimento de Software** (Canoas/RS; CNPJ 63.801.318/0001-91; (51) 9978-4248).
+**conhecimento**: textos + chat com IA no browser; kanban entra na fatia B. Âncora: segundo cérebro de **Arthur Bamberg** primeiro; o mesmo núcleo vira oferta da **Bamberg Desenvolvimento de Software** (Canoas/RS; CNPJ 63.801.318/0001-91; (51) 9978-4248).
 
 MVP atual a implementar: **MVP-A — “Chat sobre os meus textos”**.
 

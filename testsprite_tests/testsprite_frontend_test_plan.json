@@ -1,0 +1,707 @@
+[
+  {
+    "id": "TC001",
+    "title": "Open chat and send a question with sources",
+    "description": "This verifies that the chat page accepts a question, shows a streamed assistant reply, and presents cited source chips linking back to textos.",
+    "category": "Chat over saved textos",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /chat"
+      },
+      {
+        "type": "action",
+        "description": "Enter a question about the saved textos"
+      },
+      {
+        "type": "action",
+        "description": "Send the question"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify an assistant reply is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify source chips are displayed for the reply"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC002",
+    "title": "Land on textos from the root redirect",
+    "description": "This verifies that opening the app takes the user to the textos workspace automatically.",
+    "category": "App shell and navigation",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the user lands on the textos workspace"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC003",
+    "title": "Open the app and land on the textos workspace",
+    "description": "This verifies that opening the app takes the user to the textos workspace where the list and workspace summary are visible.",
+    "category": "Edit texto",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the textos workspace is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the workspace summary and textos list are displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC004",
+    "title": "Edit, preview, and save a texto",
+    "description": "This verifies that a user can update a texto, preview the rendered markdown, and save the changes successfully.",
+    "category": "Open and edit texto",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /textos"
+      },
+      {
+        "type": "action",
+        "description": "Click a texto in the list"
+      },
+      {
+        "type": "action",
+        "description": "Update the title field"
+      },
+      {
+        "type": "action",
+        "description": "Update the markdown body field"
+      },
+      {
+        "type": "action",
+        "description": "Switch to the preview view"
+      },
+      {
+        "type": "action",
+        "description": "Save the texto"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify rendered markdown is displayed in the preview"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the saved texto remains available"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC005",
+    "title": "Create a new chat conversation and send a question",
+    "description": "This verifies that a user can create a new conversa in chat, send a question, and see the conversation populate with a user message and assistant reply.",
+    "category": "Chat with AI over textos",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /chat"
+      },
+      {
+        "type": "action",
+        "description": "Create a new conversa"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the message field with a question about the saved textos"
+      },
+      {
+        "type": "action",
+        "description": "Send the message"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the user message appears in the conversation"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify an assistant reply is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC006",
+    "title": "Create a first texto",
+    "description": "This verifies that a user can create a texto with a required title and markdown body and see it added to the list.",
+    "category": "List and create textos",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /textos"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the title field with Texto de teste"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the markdown content field with a short paragraph and a list"
+      },
+      {
+        "type": "action",
+        "description": "Submit the create form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the new texto appears in the list"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the workspace summary is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC007",
+    "title": "Create a first texto and see it in the list",
+    "description": "This verifies that a user can create a texto with the required title and markdown content and then see it appear in the textos list.",
+    "category": "Edit texto",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /textos"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the title field with Introdução"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the content field with a valid markdown note"
+      },
+      {
+        "type": "action",
+        "description": "Submit the create texto form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the new texto appears in the list"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a generated workspace summary is visible"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC008",
+    "title": "Open an existing texto and edit its content",
+    "description": "This verifies that a user can open a texto, change its title and markdown body, save the changes, and see the updated content in the editor.",
+    "category": "Edit texto",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /textos"
+      },
+      {
+        "type": "action",
+        "description": "Click a texto in the list to open it"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the title field with an updated title"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the content field with updated markdown content"
+      },
+      {
+        "type": "action",
+        "description": "Save the texto"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the saved confirmation is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the updated texto content is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC009",
+    "title": "View the textos list and workspace summary",
+    "description": "This verifies that the textos page shows existing items together with the workspace summary.",
+    "category": "List and create textos",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /textos"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify textos are listed and the workspace summary is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC010",
+    "title": "See cited source textos in a chat reply",
+    "description": "This verifies that a chat response includes source chips that link back to the relevant textos when the assistant cites sources.",
+    "category": "Chat with AI over textos",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /chat"
+      },
+      {
+        "type": "action",
+        "description": "Create a new conversa"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the message field with a question that should use saved textos"
+      },
+      {
+        "type": "action",
+        "description": "Send the message"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify source chips are displayed in the assistant reply"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the cited sources link back to textos"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC011",
+    "title": "Open an existing texto for editing",
+    "description": "This verifies that selecting a texto opens its editor with the texto content available for review and changes.",
+    "category": "Open and edit texto",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /textos"
+      },
+      {
+        "type": "action",
+        "description": "Click a texto in the list"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the texto editor is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the texto content is available for editing"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC012",
+    "title": "Continue an existing chat conversation with a follow-up question",
+    "description": "This verifies that a user can open an existing conversa, review prior messages, and append a follow-up question to the same thread.",
+    "category": "Chat with AI over textos",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /chat"
+      },
+      {
+        "type": "action",
+        "description": "Select an existing conversa"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify prior messages are displayed"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the message field with a follow-up question"
+      },
+      {
+        "type": "action",
+        "description": "Send the message"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the new assistant reply is appended to the same conversation"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC013",
+    "title": "Review prior chat messages and continue the same conversation",
+    "description": "This verifies that an existing conversation keeps earlier messages visible and appends a new assistant reply after a follow-up question.",
+    "category": "Chat over saved textos",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /chat"
+      },
+      {
+        "type": "action",
+        "description": "Open an existing conversation or create a new one"
+      },
+      {
+        "type": "action",
+        "description": "Review the prior chat messages"
+      },
+      {
+        "type": "action",
+        "description": "Send a follow-up question"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the conversation still shows earlier messages"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the new assistant reply is appended"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC014",
+    "title": "Preview rendered markdown in a texto",
+    "description": "This verifies that a user can switch a texto into preview mode and see the markdown rendered before returning to editing.",
+    "category": "Edit texto",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /textos"
+      },
+      {
+        "type": "action",
+        "description": "Click a texto in the list to open it"
+      },
+      {
+        "type": "action",
+        "description": "Switch to preview mode"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the rendered markdown preview is displayed"
+      },
+      {
+        "type": "action",
+        "description": "Switch back to editing mode"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the editing textarea is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC015",
+    "title": "Delete a texto from the list and confirm removal",
+    "description": "This verifies that a texto can be removed from the list after browser confirmation and no longer appears afterward.",
+    "category": "Delete texto from list",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /textos"
+      },
+      {
+        "type": "action",
+        "description": "Click the delete control for a texto in the list"
+      },
+      {
+        "type": "action",
+        "description": "Confirm the deletion prompt"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the texto no longer appears in the list"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC016",
+    "title": "Delete a texto from the editor and return to the list",
+    "description": "This verifies that a user can delete the currently open texto from the editor and confirm it no longer appears in the textos list.",
+    "category": "Delete texto from editor",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /textos"
+      },
+      {
+        "type": "action",
+        "description": "Click a texto in the list to open it"
+      },
+      {
+        "type": "action",
+        "description": "Delete the texto from the editor"
+      },
+      {
+        "type": "action",
+        "description": "Return to the textos list"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the deleted texto no longer appears in the list"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the textos list is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC017",
+    "title": "Create a new conversation from the chat sidebar",
+    "description": "This verifies that the chat sidebar lets the user start a fresh conversation and see the sidebar state update after selection.",
+    "category": "Chat over saved textos",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /chat"
+      },
+      {
+        "type": "action",
+        "description": "Create a new conversation"
+      },
+      {
+        "type": "action",
+        "description": "Select the new conversation in the sidebar"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the conversation sidebar shows the selected conversation"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the chat area shows an empty or fresh conversation state"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC018",
+    "title": "Show the empty state when no textos exist",
+    "description": "This verifies that the textos page presents an empty state before any texto is created.",
+    "category": "List and create textos",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /textos"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify an empty state message is visible when there are no textos"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC019",
+    "title": "Delete a texto from the editor",
+    "description": "This verifies that a texto can be deleted directly from the editor and is removed from the workspace.",
+    "category": "Open and edit texto",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /textos"
+      },
+      {
+        "type": "action",
+        "description": "Click a texto in the list"
+      },
+      {
+        "type": "action",
+        "description": "Delete the texto from the editor"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the texto is removed from the workspace"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the user returns to the textos list"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC020",
+    "title": "See the empty chat state before sending the first message",
+    "description": "This verifies that opening a conversa with no messages shows the empty state and still allows the first question to be sent.",
+    "category": "Chat with AI over textos",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /chat"
+      },
+      {
+        "type": "action",
+        "description": "Create a new conversa"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the empty state message is visible"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the message field with a first question"
+      },
+      {
+        "type": "action",
+        "description": "Send the message"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the conversation now contains messages"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC021",
+    "title": "Switch between Textos and Chat in the header",
+    "description": "This verifies that the header navigation lets the user move between the main app areas and back again.",
+    "category": "App shell and navigation",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /textos"
+      },
+      {
+        "type": "action",
+        "description": "Click the header navigation to open Chat"
+      },
+      {
+        "type": "action",
+        "description": "Click the header navigation to return to Textos"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the user can move between the main workspace sections"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC022",
+    "title": "Return to textos with the brand link",
+    "description": "This verifies that the brand link brings the user back to the textos list from another section of the app.",
+    "category": "App shell and navigation",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /chat"
+      },
+      {
+        "type": "action",
+        "description": "Click the brand link in the shell"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the user returns to the textos workspace"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC023",
+    "title": "Keep a texto from being created without a title",
+    "description": "This verifies that the create form blocks submission when the required title is missing and shows validation feedback.",
+    "category": "List and create textos",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /textos"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the markdown content field with content without a title"
+      },
+      {
+        "type": "action",
+        "description": "Submit the create form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a title validation error is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the texto is not created"
+      }
+    ],
+    "priority": "Low"
+  },
+  {
+    "id": "TC024",
+    "title": "See the texto not found state for an invalid texto id",
+    "description": "This verifies that opening an invalid texto id shows the not found state and lets the user return to the list.",
+    "category": "Edit texto",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /textos"
+      },
+      {
+        "type": "action",
+        "description": "Open a texto using an invalid id route"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the texto not found message is visible"
+      },
+      {
+        "type": "action",
+        "description": "Return to the textos list"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the textos list is displayed"
+      }
+    ],
+    "priority": "Low"
+  },
+  {
+    "id": "TC025",
+    "title": "Read the footer identity and contact details",
+    "description": "This verifies that the app shell shows the expected institutional footer information in Portuguese.",
+    "category": "App shell and navigation",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /textos"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the footer identity and contact information are visible"
+      }
+    ],
+    "priority": "Low"
+  }
+]
